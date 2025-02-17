@@ -26,3 +26,19 @@ Note: If the command asks to install yarn, use npm install expo instead (as show
 npx expo start
 (QR code will display in the terminal for phone scan)
 ```
+
+**<ins>Packages installed:<ins>**
+```
+(using npm)
+npm install expo
+npm install firebase
+npm install firebase
+
+OR
+
+(npx - recommended)
+npx expo install @react-native-firebase/app
+npx expo install @react-native-firebase/firestore
+```
+
+* README is tentaive. changes will be made.
