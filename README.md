@@ -1,7 +1,28 @@
 # YummyFood
-This is for the CPSC 490 Capstone Project. YummyFood is a mobile and website application.
+This is for the CPSC 490 Capstone Project. YummyFood is a mobile iOS application showing food recipes you can make, save, and modify to your own preferences. 
+Features include your own Meal Plan and a Nutrition Calculator to meet your dietary needs.
 
-How to run:
-npx expo start 
-(it's going to display a QR code and you would have to use a camera roll to scan the QR code)
-(need Expo Go)
+**<ins>How to run:</ins>**
+The following will be needed to run this project:
+1. VSC/Terminal 
+3. (For MAC users) A phone for Camera app to scan
+4. Expo Go app
+
+There are ways you can run this project with MAC and Windows:
+1. **MAC**
+```
+There are 2 ways:
+(1) (if you haven't installed expo using npm)
+npm install expo 
+npm run start (a QR code will show in the terminal to be scanned)
+
+(2) (npx)
+npx expo start
+```
+Note: If the command asks to install yarn, use npm install expo instead (as shown above).
+
+2. **Windows**
+```
+npx expo start
+(QR code will display in the terminal for phone scan)
+```
