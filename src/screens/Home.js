@@ -4,6 +4,7 @@ import { Searchbar } from 'react-native-paper';
 
 export default function Home() {
   return (
+    // homepage screen
     <View style={styles.container}>
       // search bar
       <View style={styles.search}>
@@ -11,7 +12,6 @@ export default function Home() {
           placeholder="Search YummyFoods Recipe"
         />
       </View>
-
       // homepage text
       <Text style={styles.text}>This is the Home Screen</Text>
     </View>
@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     height: 25,
     borderRadius: 10,
     padding: 10,
+    // set search bar to the top of the container
     position: 'absolute',
     top: 0,
     left: 0,
