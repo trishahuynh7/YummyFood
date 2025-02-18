@@ -33,10 +33,12 @@ npx expo start
 npm install expo
 npm install firebase
 npm install firebase
+npm install react-native-paper (for searchbar)
 
 OR
 
 (npx - recommended)
+npx expo install react-native-paper (for serarchbar)
 npx expo install @react-native-firebase/app
 npx expo install @react-native-firebase/firestore
 ```
