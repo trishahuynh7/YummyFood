@@ -1,18 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const handleClear = () => {
+    setSearchQuery('');
+    searchBarRef.current.blur();
+  };
+
   return (
-    // homepage screen
     <View style={styles.container}>
-      // search bar
       <View style={styles.search}>
         <Searchbar
           placeholder="Search YummyFoods Recipe"
+          onChangeText={setSearchQuery}
+          showCancel={true}
+          onClear={handleClear}
+          value={searchQuery}
         />
       </View>
-      // homepage text
       <Text style={styles.text}>This is the Home Screen</Text>
     </View>
   );
@@ -32,10 +40,12 @@ const styles = StyleSheet.create({
     height: 25,
     borderRadius: 10,
     padding: 10,
-    // set search bar to the top of the container
+    // search bar goes top position
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-  }
+  },
+  // cancel: {
+  // }
 });
