@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Modal } from 'react-native';
 import { Searchbar } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons'; // For food type icons
+import { Entypo } from '@expo/vector-icons'; // For food type icons
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -55,12 +55,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
   },
   searchBar: {
     width: '90%',
     marginTop: 0,
-    marginBottom: 20,    
+    marginBottom: 20,  
+    backgroundColor: '#cee8c8'  
   },
   // Food types (under search bar)
   categoryContainer: {
@@ -84,3 +85,8 @@ const styles = StyleSheet.create({
   },
 });
 
+// note to self:
+// have the following:
+// 1. get started recipe section
+// 2. favorites/saved recipes
+// 3. viewed recipes
