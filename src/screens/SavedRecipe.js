@@ -5,12 +5,12 @@ import {View, Text, FlatList, TouchableOpacity, StyleSheet,
 import { BlurView } from 'expo-blur';
 import { Feather } from '@expo/vector-icons';
 
-// Placeholder recipes. will update soon with saved data.
+// Placeholders for now. Can be updated with data from database when user saves recipes.
 const savedRecipesData = [
   {
     id: '1',
     title: 'Fluffy Pancakes',
-    image: 'https://source.unsplash.com/800x600/?pancakes',
+    image: 'https://eatsbythebeach.com/wp-content/uploads/2022/03/Super-Fluffy-Buttermilk-Pancakes-1-Eats-By-The-Beach.jpeg',
     description: 'Light and fluffy pancakes made from scratch.',
     ingredients: ['Flour', 'Eggs', 'Milk'],
     steps: ['Mix ingredients', 'Cook on skillet', 'Serve with syrup'],
@@ -18,7 +18,7 @@ const savedRecipesData = [
   {
     id: '2',
     title: 'Baked Chicken',
-    image: 'https://source.unsplash.com/800x600/?chicken',
+    image: 'https://krystelscooking.com/wp-content/uploads/2022/04/roastedchicken.jpg',
     description: 'Juicy oven-baked chicken with herbs.',
     ingredients: ['Chicken', 'Garlic', 'Rosemary'],
     steps: ['Preheat oven', 'Season chicken', 'Bake 40 mins'],
@@ -27,7 +27,7 @@ const savedRecipesData = [
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-export default function SavedRecipes() {
+export default function SavedRecipe() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -229,13 +229,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 10,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    marginBottom: 10,
+    paddingTop: 20,
   },
   list: {
     paddingHorizontal: 16,
@@ -265,7 +259,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     paddingBottom: 40,
-    overflow: 'hidden',
   },
   modalImage: {
     width: '100%',
@@ -282,6 +275,7 @@ const styles = StyleSheet.create({
   },
   modalSubtitle: {
     marginTop: 10,
+    marginBottom: 5,
     fontWeight: '600',
     fontSize: 16,
   },
@@ -293,25 +287,29 @@ const styles = StyleSheet.create({
   inputTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
+    borderColor: 'gray',
     marginBottom: 10,
   },
   inputText: {
-    fontSize: 14,
-    borderBottomWidth: 1,
+    fontSize: 15,
+    borderBottomWidth: 0.5,
+    borderColor: 'gray',
     marginBottom: 15,
   },
   button: {
     marginTop: 10,
     padding: 10,
+    marginBottom: 10,
     backgroundColor: '#f57c00',
     borderRadius: 10,
     alignItems: 'center',
   },
   iconButton: {
-    marginTop: 10,
+    marginTop: 20,
+    marginBottom: 20,
     padding: 10,
-    backgroundColor: '#4caf50',
+    backgroundColor: '#34C759',
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -319,11 +317,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  addButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#34C759',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+  },
   closeButton: {
     position: 'absolute',
-    top: 10,
-    right: 16,
-    zIndex: 10,
-    padding: 8,
+    right: 20,
+    top: 20,
+    zIndex: 1,
   },
 });
