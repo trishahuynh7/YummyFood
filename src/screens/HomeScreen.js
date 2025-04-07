@@ -11,10 +11,10 @@ const Tab = createBottomTabNavigator();
 
 const ICONS = {
   Home: 'home',
-  MealPlan: 'list',
+  MealPlan: 'calendar',
   Camera: 'camera',
-  SavedRecipe: 'save',
-  Settings: 'cog',
+  Saved: 'heart',
+  Account: 'emoji-happy',
 };
 
 export default function HomeScreen() {
@@ -32,8 +32,8 @@ export default function HomeScreen() {
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="MealPlan" component={MealPlan} />
       <Tab.Screen name="Camera" component={Camera} />
-      <Tab.Screen name="SavedRecipe" component={SavedRecipe} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen name="Saved" component={SavedRecipe} />
+      <Tab.Screen name="Account" component={Settings} />
     </Tab.Navigator>
   );
 }
