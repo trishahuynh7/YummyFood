@@ -46,7 +46,7 @@ export default function WelcomeScreen() {
                     autoPlay
                     loop
                 />
-                <Text className="text-4xl font-bold text-green-500">Yummy Food</Text>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#34C759', marginTop: 10 }}>Yummy Food</Text>
             </View>
         </View>
     );
