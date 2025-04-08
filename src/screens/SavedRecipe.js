@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet,
-  Modal, Image, Animated, PanResponder, Dimensions,
-  TextInput, ScrollView } from 'react-native';
+  Modal, Image, Animated, Dimensions, TextInput, ScrollView,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Feather } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 
-// Placeholders for now. Can be updated with data from database when user saves recipes.
+// Placeholders for now. 
+// Will have to implement data from the db to 
+// receive data of saved recipes
 const savedRecipesData = [
   {
     id: '1',
@@ -27,37 +29,22 @@ const savedRecipesData = [
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-export default function SavedRecipe() {
+export default function SavedRecipes() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedRecipe, setEditedRecipe] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newRecipe, setNewRecipe] = useState({
+    id: '',
+    title: '',
+    description: '',
+    ingredients: [''],
+    steps: [''],
+    image: 'https://source.unsplash.com/800x600/?food',
+  });
 
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const scrollY = useRef(0);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return scrollY.current <= 0 && gestureState.dy > 10;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          slideAnim.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 100) {
-          closeModal();
-        } else {
-          Animated.spring(slideAnim, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
 
   const openModal = (recipe) => {
     setSelectedRecipe(recipe);
@@ -80,6 +67,15 @@ export default function SavedRecipe() {
       setModalVisible(false);
       setSelectedRecipe(null);
       setIsEditing(false);
+      setIsAdding(false);
+      setNewRecipe({
+        id: '',
+        title: '',
+        description: '',
+        ingredients: [''],
+        steps: [''],
+        image: 'https://source.unsplash.com/800x600/?food',
+      });
     });
   };
 
@@ -91,18 +87,29 @@ export default function SavedRecipe() {
     setIsEditing(false);
   };
 
-  const addIngredient = () => {
-    setEditedRecipe({
-      ...editedRecipe,
-      ingredients: [...editedRecipe.ingredients, ''],
-    });
+  const addIngredient = (isNew = false) => {
+    if (isNew) {
+      setNewRecipe({ ...newRecipe, ingredients: [...newRecipe.ingredients, ''] });
+    } else {
+      setEditedRecipe({ ...editedRecipe, ingredients: [...editedRecipe.ingredients, ''] });
+    }
   };
 
-  const addStep = () => {
-    setEditedRecipe({
-      ...editedRecipe,
-      steps: [...editedRecipe.steps, ''],
-    });
+  const addStep = (isNew = false) => {
+    if (isNew) {
+      setNewRecipe({ ...newRecipe, steps: [...newRecipe.steps, ''] });
+    } else {
+      setEditedRecipe({ ...editedRecipe, steps: [...editedRecipe.steps, ''] });
+    }
+  };
+
+  const createRecipe = () => {
+    const newEntry = {
+      ...newRecipe,
+      id: Date.now().toString(),
+    };
+    savedRecipesData.push(newEntry);
+    closeModal();
   };
 
   const renderRecipe = ({ item }) => (
@@ -121,77 +128,102 @@ export default function SavedRecipe() {
         contentContainerStyle={styles.list}
       />
 
+      {/* Add Button */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          setIsAdding(true);
+          setModalVisible(true);
+        }}
+      >
+        <Entypo name="plus" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Recipe Modal */}
       {modalVisible && (
         <Modal transparent animationType="none" visible={modalVisible}>
           <BlurView intensity={50} style={StyleSheet.absoluteFill} tint="light" />
 
           <Animated.View
             style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}
-            {...panResponder.panHandlers}
           >
+            <Image
+              source={{ uri: isAdding ? newRecipe.image : selectedRecipe?.image }}
+              style={styles.modalImage}
+            />
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-              <Feather name="x" size={24} color="#333" />
+              <Entypo name="circle-with-cross" size={25} color="#FFFFF" />
             </TouchableOpacity>
-
-            <Image source={{ uri: selectedRecipe?.image }} style={styles.modalImage} />
-            <ScrollView
-              style={styles.modalBody}
-              onScroll={(e) => {
-                scrollY.current = e.nativeEvent.contentOffset.y;
-              }}
-              scrollEventThrottle={16}
-              contentContainerStyle={{ paddingBottom: 80 }}
-            >
-              {isEditing ? (
+            <ScrollView style={styles.modalBody}>
+              { (isEditing || isAdding) ? (
                 <>
                   <TextInput
                     style={styles.inputTitle}
-                    value={editedRecipe.title}
-                    onChangeText={(text) => setEditedRecipe({ ...editedRecipe, title: text })}
+                    placeholder="Recipe Title"
+                    value={isAdding ? newRecipe.title : editedRecipe.title}
+                    onChangeText={(text) =>
+                      isAdding
+                        ? setNewRecipe({ ...newRecipe, title: text })
+                        : setEditedRecipe({ ...editedRecipe, title: text })
+                    }
                   />
                   <TextInput
                     style={styles.inputText}
-                    value={editedRecipe.description}
-                    onChangeText={(text) => setEditedRecipe({ ...editedRecipe, description: text })}
+                    placeholder="Description"
+                    value={isAdding ? newRecipe.description : editedRecipe.description}
+                    onChangeText={(text) =>
+                      isAdding
+                        ? setNewRecipe({ ...newRecipe, description: text })
+                        : setEditedRecipe({ ...editedRecipe, description: text })
+                    }
                     multiline
                   />
 
                   <Text style={styles.modalSubtitle}>Ingredients:</Text>
-                  {editedRecipe.ingredients.map((item, index) => (
+                  {(isAdding ? newRecipe.ingredients : editedRecipe.ingredients).map((item, index) => (
                     <TextInput
                       key={index}
                       style={styles.inputText}
+                      placeholder="Ingredient"
                       value={item}
                       onChangeText={(text) => {
-                        const newIngredients = [...editedRecipe.ingredients];
-                        newIngredients[index] = text;
-                        setEditedRecipe({ ...editedRecipe, ingredients: newIngredients });
+                        const updated = [...(isAdding ? newRecipe.ingredients : editedRecipe.ingredients)];
+                        updated[index] = text;
+                        isAdding
+                          ? setNewRecipe({ ...newRecipe, ingredients: updated })
+                          : setEditedRecipe({ ...editedRecipe, ingredients: updated });
                       }}
                     />
                   ))}
-                  <TouchableOpacity onPress={addIngredient} style={styles.button}>
+                  <TouchableOpacity onPress={() => addIngredient(isAdding)} style={styles.button}>
                     <Text style={styles.buttonText}>+ Add Ingredient</Text>
                   </TouchableOpacity>
 
                   <Text style={styles.modalSubtitle}>Steps:</Text>
-                  {editedRecipe.steps.map((step, index) => (
+                  {(isAdding ? newRecipe.steps : editedRecipe.steps).map((step, index) => (
                     <TextInput
                       key={index}
                       style={styles.inputText}
+                      placeholder="Step"
                       value={step}
                       onChangeText={(text) => {
-                        const newSteps = [...editedRecipe.steps];
-                        newSteps[index] = text;
-                        setEditedRecipe({ ...editedRecipe, steps: newSteps });
+                        const updated = [...(isAdding ? newRecipe.steps : editedRecipe.steps)];
+                        updated[index] = text;
+                        isAdding
+                          ? setNewRecipe({ ...newRecipe, steps: updated })
+                          : setEditedRecipe({ ...editedRecipe, steps: updated });
                       }}
                     />
                   ))}
-                  <TouchableOpacity onPress={addStep} style={styles.button}>
+                  <TouchableOpacity onPress={() => addStep(isAdding)} style={styles.button}>
                     <Text style={styles.buttonText}>+ Add Step</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={saveEdits} style={styles.button}>
-                    <Text style={styles.buttonText}>Save</Text>
+                  <TouchableOpacity
+                    onPress={isAdding ? createRecipe : saveEdits}
+                    style={styles.button}
+                  >
+                    <Text style={styles.buttonText}>{isAdding ? 'Create' : 'Save'}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setIsEditing(false)} style={styles.button}>
                     <Text style={styles.buttonText}>Cancel</Text>
@@ -213,7 +245,7 @@ export default function SavedRecipe() {
                   ))}
 
                   <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.iconButton}>
-                    <Feather name="edit" size={20} color="#fff" />
+                    <Entypo name="edit" size={20} color="#fff" />
                   </TouchableOpacity>
                 </>
               )}
@@ -298,10 +330,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    marginTop: 10,
+    marginTop: 5,
     padding: 10,
-    marginBottom: 10,
-    backgroundColor: '#f57c00',
+    marginBottom: 15,
+    backgroundColor: '#F8931F',
     borderRadius: 10,
     alignItems: 'center',
   },
