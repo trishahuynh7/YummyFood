@@ -4,7 +4,7 @@ import { Entypo } from '@expo/vector-icons';
 import MealPlan from './MealPlan';
 import Camera from './Camera';
 import SavedRecipe from './SavedRecipe';
-import Settings from './Settings';
+import Account from './Account';
 import Home from './Home'; // Import the Home component
 
 const Tab = createBottomTabNavigator();
@@ -33,7 +33,7 @@ export default function HomeScreen() {
       <Tab.Screen name="MealPlan" component={MealPlan} />
       <Tab.Screen name="Camera" component={Camera} />
       <Tab.Screen name="Saved" component={SavedRecipe} />
-      <Tab.Screen name="Account" component={Settings} />
+      <Tab.Screen name="Account" component={Account} />
     </Tab.Navigator>
   );
 }
