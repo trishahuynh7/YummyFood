@@ -34,6 +34,8 @@ npm install expo
 npm install firebase
 npm install firebase
 npm install react-native-paper (for searchbar)
+npx expo prebuild
+
 
 OR
 
