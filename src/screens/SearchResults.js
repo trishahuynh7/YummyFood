@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { Entypo } from '@expo/vector-icons';
 import { db } from './firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
@@ -12,6 +13,7 @@ export default function SearchResults({ route }) {
   const [loading, setLoading] = useState(true);
   
   const navigation = useNavigation();
+
 
   useEffect(() => {
     // If we have allRecipes from Home, use those for filtering
@@ -125,18 +127,33 @@ export default function SearchResults({ route }) {
       onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}
     >
       <Image 
-        source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }} 
+        source={{ uri: item.imageURL || 'https://via.placeholder.com/150' }} 
         style={styles.image} 
-      />
-      <Text style={styles.recipeTitle} numberOfLines={1}>{item.name || item.title}</Text>
-      <Text style={styles.recipeDescription} numberOfLines={2}>
-        {item.description || ''}
-      </Text>
+        />
+        <View style={styles.recipeInfo}>
+          <Text style={styles.recipeTitle} numberOfLines={1}>{item.name || item.title}</Text>
+          <Text style={styles.recipeDescription} numberOfLines={2}>
+            {item.description || ''}
+          </Text>
+        </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+
+      {/* Back Button */}
+      <TouchableOpacity 
+      style={styles.backButton}
+      onPress={() => {
+         navigation.navigate('HomeScreen', {
+            screen: 'Home'
+        });
+      }}
+     >
+     <Entypo name="chevron-left" size={24} color="#333" />
+    </TouchableOpacity>
+
       {/* Search Bar */}
       <Searchbar
         placeholder="Refine your search"
@@ -184,9 +201,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 15,
+    paddingTop: 70
+  },
+  backButton: {
+    position: 'absolute',
+    bottom: 40,
+    left: 25,
+    backgroundColor: '#cee8c8',
+    padding: 10,
+    borderRadius: 50,
+    zIndex: 10, // Ensures it's above FlatList content,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
   },
   searchBar: {
-    marginBottom: 15,
+    marginBottom: 25,
     backgroundColor: '#cee8c8',
   },
   resultsHeader: {

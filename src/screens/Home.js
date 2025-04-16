@@ -83,7 +83,7 @@ export default function Home() {
       onPress={() => navigation.navigate('RecipeDetail', { recipeId: item.id })}
     >
       <Image 
-        source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }} 
+        source={{ uri: item.imageURL || 'https://via.placeholder.com/150' }} 
         style={styles.image} 
       />
       <Text style={styles.recipeTitle} numberOfLines={1}>{item.name || item.title}</Text>
