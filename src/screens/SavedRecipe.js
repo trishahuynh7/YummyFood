@@ -8,6 +8,10 @@ import { Entypo } from '@expo/vector-icons';
 // Placeholders for now. 
 // Will have to implement data from the db to 
 // receive data of saved recipes
+
+// Trying to have an add option to this page
+// Will be in Account page for now
+// User create recipes should go to Saved Recipes
 const savedRecipesData = [
   {
     id: '1',
@@ -29,12 +33,26 @@ const savedRecipesData = [
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
+const toggleSave = (recipeId) => {
+  const [savedRecipeIds, setSavedRecipeIds] = useState(new Set());
+  setSavedRecipeIds((prev) => {
+    const updated = new Set(prev);
+    if (updated.has(recipeId)) {
+      updated.delete(recipeId);
+    } else {
+      updated.add(recipeId);
+    }
+    return updated;
+  });
+};
+
 export default function SavedRecipes() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedRecipe, setEditedRecipe] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [savedRecipeIds, setSavedRecipeIds] = useState(new Set());
   const [newRecipe, setNewRecipe] = useState({
     id: '',
     title: '',
@@ -112,12 +130,24 @@ export default function SavedRecipes() {
     closeModal();
   };
 
-  const renderRecipe = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <Text style={styles.cardTitle}>{item.title}</Text>
-    </TouchableOpacity>
-  );
+  const renderRecipe = ({ item }) => {
+    const isSaved = savedRecipeIds.has(item.id);
+    return (
+      <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
+        <Image source={{ uri: item.image }} style={styles.cardImage} />
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>{item.title}</Text>
+          <TouchableOpacity onPress={() => toggleSave(item.id)}>
+            <Entypo
+              name={isSaved ? 'heart' : 'heart-outlined'}
+              size={24}
+              color={isSaved ? 'red' : 'gray'}
+            />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -127,17 +157,6 @@ export default function SavedRecipes() {
         renderItem={renderRecipe}
         contentContainerStyle={styles.list}
       />
-
-      {/* Add Button */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => {
-          setIsAdding(true);
-          setModalVisible(true);
-        }}
-      >
-        <Entypo name="plus" size={28} color="#fff" />
-      </TouchableOpacity>
 
       {/* Recipe Modal */}
       {modalVisible && (
@@ -272,6 +291,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffe0cc',
     padding: 10,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
   cardImage: {
     width: '100%',
     height: 150,
@@ -280,7 +305,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginTop: 10,
   },
   modalContent: {
     position: 'absolute',
@@ -327,14 +351,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderBottomWidth: 0.5,
     borderColor: 'gray',
-    marginBottom: 15,
+    marginBottom: 5,
+    padding: 5,
   },
   button: {
     marginTop: 5,
     padding: 10,
     marginBottom: 15,
     backgroundColor: '#F8931F',
-    borderRadius: 10,
+    borderRadius: 25,
     alignItems: 'center',
   },
   iconButton: {
@@ -342,24 +367,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 10,
     backgroundColor: '#34C759',
-    borderRadius: 10,
+    borderRadius: 25,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
-  },
-  addButton: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#34C759',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
   },
   closeButton: {
     position: 'absolute',
