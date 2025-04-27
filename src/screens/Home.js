@@ -12,7 +12,7 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const EXLUDED_CATEGORIES = ['Starter', 'Vegan', 'Breakfast', 'Goat']
   
-  // Get navigation object
+
   const navigation = useNavigation();
 
   // Fetch all recipes when component mounts
@@ -21,7 +21,7 @@ export default function Home() {
     fetchCategories();
   }, []);
 
-  // Fetch recipes from API
+
   const fetchRecipes = async () => {
     try {
       setLoading(true);
@@ -30,7 +30,7 @@ export default function Home() {
       const filteredList = recipesList.filter(
         meal => !EXLUDED_CATEGORIES.includes(meal.strCategory)
       );
-      // Transform API data to match your app's expected format
+
       const formattedRecipes = filteredList.map(meal => ({
         id: meal.idMeal,
         name: meal.strMeal,
@@ -48,7 +48,6 @@ export default function Home() {
     }
   };
 
-  // Helper function to extract ingredients from the API response
   const extractIngredients = (meal) => {
     const ingredients = [];
     for (let i = 1; i <= 20; i++) {
@@ -76,11 +75,11 @@ export default function Home() {
         category => !EXLUDED_CATEGORIES.includes(category.strCategory)
       );
       
-      // Transform API data to match your app's expected format
+
       const formattedCategories = filteredCategories.map(category => ({
         id: category.strCategory,
         name: renameCategory(category.strCategory),
-        icon: getCategoryIcon(category.strCategory) // Map category names to your existing icons
+        icon: getCategoryIcon(category.strCategory) 
       }));
       
       setCategories(formattedCategories);
@@ -89,7 +88,7 @@ export default function Home() {
     }
   };
 
-  // Map category names to your existing icons
+
   const getCategoryIcon = (categoryName) => {
     const iconMap = {
       'Beef': 'food-steak',
@@ -104,12 +103,11 @@ export default function Home() {
       'Vegetarian': 'food-apple',
     };
     
-    return iconMap[categoryName] || 'bowl'; // Default icon
+    return iconMap[categoryName] || 'bowl'; 
   };
 
   const handleSearch = () => {
     if (searchQuery.trim() !== '') {
-      // Navigate to search results page with the search query
       navigation.navigate('SearchResults', { query: searchQuery, allRecipes: recipes });
     }
   };
@@ -123,7 +121,6 @@ export default function Home() {
   };
 
   const filterByCategory = (categoryName) => {
-    // Navigate to search results page with the category filter
     navigation.navigate('SearchResults', { 
       categoryId: categoryName, 
       allRecipes: recipes 
@@ -143,8 +140,8 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-  // Show some featured recipes on the home page
-  const featuredRecipes = recipes.slice(0, 6); // Just show first 4 recipes as featured
+
+  const featuredRecipes = recipes.slice(0, 6);
 
   return (
     <View style={styles.container}>     
@@ -180,7 +177,7 @@ export default function Home() {
             )}
           />
         ) : (
-          // Fallback to the default circles if no categories are loaded
+
           [1, 2, 3, 4].map((item, index) => (
             <View key={index} style={styles.categoryCircle} />
           ))

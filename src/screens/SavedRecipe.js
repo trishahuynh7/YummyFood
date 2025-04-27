@@ -7,10 +7,8 @@ import { Entypo } from '@expo/vector-icons';
 import { useSavedRecipes } from '../context/SavedRecipesContext';
 import { useNavigation } from '@react-navigation/native';
 
-// Calculate card width based on screen size
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth - 30) / 2; 
-// 10 left padding + 10 right padding + 10 for space between cards
 
 export default function SavedRecipe() {
   const navigation = useNavigation();

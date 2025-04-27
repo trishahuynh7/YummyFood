@@ -16,7 +16,7 @@ export default function SearchResults({ route }) {
 
 
   useEffect(() => {
-    // If we have allRecipes from Home, use those for filtering
+
     if (allRecipes) {
       if (categoryId) {
         filterByCategory(categoryId);
@@ -24,7 +24,7 @@ export default function SearchResults({ route }) {
         filterBySearchTerm(query);
       }
     } else {
-      // If we don't have allRecipes, fetch from Firestore
+
       fetchAndFilterRecipes();
     }
   }, [query, categoryId]);
@@ -34,7 +34,6 @@ export default function SearchResults({ route }) {
       setLoading(true);
       let recipesQuery = collection(db, 'recipes');
       
-      // If there's a categoryId, filter by it
       if (categoryId) {
         recipesQuery = query(recipesQuery, where('categoryID', '==', categoryId));
       }
@@ -45,7 +44,6 @@ export default function SearchResults({ route }) {
         ...doc.data()
       }));
       
-      // If there's a search query, filter the results
       if (query) {
         const filtered = filterRecipesBySearchTerm(recipesList, query);
         setFilteredRecipes(filtered);
@@ -78,21 +76,17 @@ export default function SearchResults({ route }) {
     const searchText = term.toLowerCase();
     
     return recipes.filter(recipe => {
-      // Check recipe name/title
       const name = (recipe.name || recipe.title || '').toLowerCase();
       if (name.includes(searchText)) return true;
       
-      // Check ingredients
       const ingredientsMatch = recipe.ingredients?.some(ingredient => 
         typeof ingredient === 'string' && ingredient.toLowerCase().includes(searchText)
       ) || false;
       if (ingredientsMatch) return true;
       
-      // Check description
       const description = (recipe.description || '').toLowerCase();
       if (description.includes(searchText)) return true;
       
-      // Check tags if they exist
       const tagsMatch = recipe.tags?.some(tag => 
         typeof tag === 'string' && tag.toLowerCase().includes(searchText)
       ) || false;
@@ -113,7 +107,6 @@ export default function SearchResults({ route }) {
 
   const handleClear = () => {
     setSearchQuery('');
-    // If we had a category filter, maintain it
     if (categoryId) {
       filterByCategory(categoryId);
     } else {
@@ -210,7 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#cee8c8',
     padding: 10,
     borderRadius: 50,
-    zIndex: 10, // Ensures it's above FlatList content,
+    zIndex: 10, 
   },
   backButtonText: {
     fontSize: 16,
