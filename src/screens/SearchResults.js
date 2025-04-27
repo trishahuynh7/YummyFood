@@ -60,9 +60,9 @@ export default function SearchResults({ route }) {
     }
   };
 
-  const filterByCategory = (catId) => {
+  const filterByCategory = (catName) => {
     setLoading(true);
-    const filtered = allRecipes.filter(recipe => recipe.categoryID === catId);
+    const filtered = allRecipes.filter(recipe => recipe.categoryID === catName);
     setFilteredRecipes(filtered);
     setLoading(false);
   };

@@ -8,6 +8,7 @@ import Signup from "../screens/Signup";
 import SearchResults from '../screens/SearchResults';
 import RecipeDetail from '../screens/RecipeDetail';
 
+
 const Stack = createNativeStackNavigator();
 
 function AppNavigation() {

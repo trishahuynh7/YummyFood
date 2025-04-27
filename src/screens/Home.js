@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Searchbar } from 'react-native-paper';
-import { Entypo } from '@expo/vector-icons';
-import { db } from './firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { fetchRecipesFromAPI, fetchCategoriesFromAPI } from './api';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const EXLUDED_CATEGORIES = ['Starter', 'Vegan', 'Breakfast', 'Goat']
   
   // Get navigation object
   const navigation = useNavigation();
@@ -21,17 +21,26 @@ export default function Home() {
     fetchCategories();
   }, []);
 
-  // Fetch recipes from Firestore
+  // Fetch recipes from API
   const fetchRecipes = async () => {
     try {
       setLoading(true);
-      const recipesCollection = collection(db, 'recipes');
-      const recipesSnapshot = await getDocs(recipesCollection);
-      const recipesList = recipesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const recipesList = await fetchRecipesFromAPI();
+      
+      const filteredList = recipesList.filter(
+        meal => !EXLUDED_CATEGORIES.includes(meal.strCategory)
+      );
+      // Transform API data to match your app's expected format
+      const formattedRecipes = filteredList.map(meal => ({
+        id: meal.idMeal,
+        name: meal.strMeal,
+        imageURL: meal.strMealThumb,
+        description: meal.strInstructions,
+        categoryID: meal.strCategory,
+        ingredients: extractIngredients(meal)
       }));
-      setRecipes(recipesList);
+      
+      setRecipes(formattedRecipes);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching recipes: ", error);
@@ -39,22 +48,65 @@ export default function Home() {
     }
   };
 
-  // Fetch food categories
+  // Helper function to extract ingredients from the API response
+  const extractIngredients = (meal) => {
+    const ingredients = [];
+    for (let i = 1; i <= 20; i++) {
+      const ingredient = meal[`strIngredient${i}`];
+      if (ingredient && ingredient.trim() !== '') {
+        ingredients.push(ingredient);
+      }
+    }
+    return ingredients;
+  };
+
+  const renameCategory = (originalName) => {
+    const map = {
+      'Miscellaneous': 'Misc',
+      'Vegetarian' : 'Veggie',
+    };
+    return map[originalName] || originalName;
+  };
+
   const fetchCategories = async () => {
     try {
-      const categoriesCollection = collection(db, 'categories');
-      const categoriesSnapshot = await getDocs(categoriesCollection);
-      const categoriesList = categoriesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const categoriesList = await fetchCategoriesFromAPI();
+
+      const filteredCategories = categoriesList.filter(
+        category => !EXLUDED_CATEGORIES.includes(category.strCategory)
+      );
+      
+      // Transform API data to match your app's expected format
+      const formattedCategories = filteredCategories.map(category => ({
+        id: category.strCategory,
+        name: renameCategory(category.strCategory),
+        icon: getCategoryIcon(category.strCategory) // Map category names to your existing icons
       }));
-      setCategories(categoriesList);
+      
+      setCategories(formattedCategories);
     } catch (error) {
       console.error("Error fetching categories: ", error);
     }
   };
 
-  // Handle search submission
+  // Map category names to your existing icons
+  const getCategoryIcon = (categoryName) => {
+    const iconMap = {
+      'Beef': 'food-steak',
+      'Chicken': 'food-drumstick',
+      'Dessert': 'cake',
+      'Lamb': 'food-steak',
+      'Miscellaneous': 'food-variant',
+      'Pasta': 'pasta',
+      'Pork': 'food-steak',
+      'Seafood': 'fish',
+      'Side': 'bowl-mix',
+      'Vegetarian': 'food-apple',
+    };
+    
+    return iconMap[categoryName] || 'bowl'; // Default icon
+  };
+
   const handleSearch = () => {
     if (searchQuery.trim() !== '') {
       // Navigate to search results page with the search query
@@ -62,7 +114,6 @@ export default function Home() {
     }
   };
 
-  // Handle search text change
   const handleSearchChange = (text) => {
     setSearchQuery(text);
   };
@@ -71,10 +122,12 @@ export default function Home() {
     setSearchQuery('');
   };
 
-  // Filter recipes by category
-  const filterByCategory = (categoryId) => {
+  const filterByCategory = (categoryName) => {
     // Navigate to search results page with the category filter
-    navigation.navigate('SearchResults', { categoryId, allRecipes: recipes });
+    navigation.navigate('SearchResults', { 
+      categoryId: categoryName, 
+      allRecipes: recipes 
+    });
   };
 
   const renderRecipeItem = ({ item }) => (
@@ -91,7 +144,7 @@ export default function Home() {
   );
 
   // Show some featured recipes on the home page
-  const featuredRecipes = recipes.slice(0, 4); // Just show first 4 recipes as featured
+  const featuredRecipes = recipes.slice(0, 6); // Just show first 4 recipes as featured
 
   return (
     <View style={styles.container}>     
@@ -101,26 +154,31 @@ export default function Home() {
         onChangeText={handleSearchChange}
         value={searchQuery}
         onClear={handleClear}
-        onSubmitEditing={handleSearch} // Add this to handle search on submit
-        onIconPress={handleSearch} // Add this to handle search on icon press
+        onSubmitEditing={handleSearch}
+        onIconPress={handleSearch}
         style={styles.searchBar}
       />
 
       {/* Categories */}
       <View style={styles.categoryContainer}>
         {categories.length > 0 ? (
-          categories.map((category) => (
-            <TouchableOpacity 
-              key={category.id} 
-              style={styles.categoryCircle}
-              onPress={() => filterByCategory(category.id)}
-            >
-              {category.icon && (
-                <Entypo name={category.icon} size={24} color="white" />
-              )}
-              <Text style={styles.categoryText}>{category.name}</Text>
-            </TouchableOpacity>
-          ))
+          <FlatList
+            data={categories}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity 
+                style={styles.categoryCircle}
+                onPress={() => filterByCategory(item.id)}
+              >
+                {item.icon && (
+                  <MaterialCommunityIcons name={item.icon} size={24} color="white" />
+                )}
+                <Text style={styles.categoryText}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
         ) : (
           // Fallback to the default circles if no categories are loaded
           [1, 2, 3, 4].map((item, index) => (
@@ -158,13 +216,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 10,
     backgroundColor: '#fff',
   },
   searchBar: {
     width: '90%',
     marginTop: 0,
-    marginBottom: 20,  
+    marginBottom: 10,  
     backgroundColor: '#cee8c8'  
   },
   categoryContainer: {
@@ -172,6 +230,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 15,
     width: '100%',
+    paddingHorizontal: 10,
   },
   categoryCircle: {
     width: 60,
@@ -206,7 +265,7 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#ffe0cc',
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
