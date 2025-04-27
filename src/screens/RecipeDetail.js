@@ -27,7 +27,7 @@ export default function RecipeDetail({ route, navigation }) {
       const recipeData = await fetchRecipeById(recipeId);
       
       if (recipeData) {
-        // Format the recipe data
+
         const formattedRecipe = {
           id: recipeData.idMeal,
           name: recipeData.strMeal,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveButton: {
-    right: 60, // Position it to the left of the close button
+    right: 60, 
   },
   loadingContainer: {
     flex: 1,
