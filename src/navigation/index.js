@@ -5,9 +5,10 @@ import HomeScreen from "../screens/HomeScreen";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import Login from "../screens/Login";
 import Signup from "../screens/Signup";
+import EditProfile from "../screens/EditProfile"
 import SearchResults from '../screens/SearchResults';
 import RecipeDetail from '../screens/RecipeDetail';
-
+import Settings from "../screens/Settings"
 
 const Stack = createNativeStackNavigator();
 
