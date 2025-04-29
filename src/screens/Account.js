@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { Entypo, Feather } from '@expo/vector-icons';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
+import { getAuth } from 'firebase/auth';
 import SavedRecipe from './SavedRecipe';
 
 // PLACEHOLDER FOR NOW. Will update with actual user account info.
 export default function Account({ navigation }) {
-  const [isModalVisible, setModalVisible] = useState(false);
   const [user, setUser] = useState({
     username: 'JohnDoe',
     firstName: 'John',
@@ -69,9 +69,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    marginBottom: 25,
+    marginBottom: 5,
     backgroundColor: '#d1e6cc'
-
   },
   profileImage: {
     width: 100,
@@ -94,16 +93,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  recipesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    paddingHorizontal: 15,
-  },
   recipesSection: {
     flex: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
   },
   sectionTitle: {
     flexDirection: 'row',
