@@ -1,8 +1,9 @@
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React from 'react';
+import React, { useState }  from 'react';
 import { StatusBar } from 'expo-status-bar';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
+import { registerUser } from './auth';
 
 export default function Signup() {
     const navigation = useNavigation();
@@ -13,7 +14,7 @@ export default function Signup() {
             <Image className="h-full w-full absolute" source={require('../../assets/images/background1.png')} />
 
             {/* Title */}
-            <View className="flex items-center mb-6 mt-4 pt-12">
+            <View className="flex items-center mt-10 pt-20">
                 <Animated.Text entering={FadeInUp.duration(1000).springify()} className="text-white font-bold tracking-wider text-5xl">
                     Sign Up
                 </Animated.Text>
@@ -47,21 +48,21 @@ export default function Signup() {
                     <Animated.View entering={FadeInDown.delay(600).duration(1000).springify()} style={{ backgroundColor: 'white', padding: 16, borderRadius: 16, borderColor: 'black', borderWidth: 1, width: '100%' }}>
                         <TextInput
                             style={{ width: '100%', fontSize: 16, color: 'gray' }}
-                            placeholder="First Name"
+                            placeholder="First Name (Optional)"
                             placeholderTextColor="gray"
                         />        
                     </Animated.View>
                     <Animated.View entering={FadeInDown.delay(800).duration(1000).springify()} style={{ backgroundColor: 'white', padding: 16, borderRadius: 16, borderColor: 'black', borderWidth: 1, width: '100%' }}>
                         <TextInput
                             style={{ width: '100%', fontSize: 16, color: 'gray' }}
-                            placeholder="Last Name"
+                            placeholder="Last Name (Optional)"
                             placeholderTextColor="gray"
                         />        
                     </Animated.View>
                     <Animated.View entering={FadeInDown.delay(1000).duration(1000).springify()} style={{ backgroundColor: 'white', padding: 16, borderRadius: 16, borderColor: 'black', borderWidth: 1, width: '100%' }}>
                         <TextInput
                             style={{ width: '100%', fontSize: 16, color: 'gray' }}
-                            placeholder="Phone Number"
+                            placeholder="Phone Number (Optional)"
                             placeholderTextColor="gray"
                             keyboardType="phone-pad"
                         />        
@@ -82,4 +83,3 @@ export default function Signup() {
         </View>
     );
 }
-
