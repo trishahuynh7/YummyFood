@@ -1,17 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from 'react-native-vector-icons';
 
 const SettingsScreen = ({ navigation }) => {
-  // const [username, setUsername] = useState('JohnDoe');
-  // const [firstName, setFirstName] = useState('John');
-  // const [lastName, setLastName] = useState('Doe');
-  // const [email, setEmail] = useState('johndoe@example.com');
-  // const [password, setPassword] = useState('');
-
-  const handleSave = () => {
-    // Implement your save logic here, such as updating the user profile via API
-    Alert.alert('Success', 'Your changes have been saved.');
-  };
 
   const handleLogout = () => {
     // Implement your logout logic here, such as clearing user data and navigating to the login screen
@@ -23,28 +14,23 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-      {/* <Text style={styles.label}>Username</Text>
-      <TextInput value={username} onChangeText={setUsername} style={styles.input} />
+            <View style={styles.header}>
+        <Ionicons
+          name="arrow-back"
+          size={30}
+          color="black"
+          onPress={() => navigation.goBack()} // Navigate back to Account page
+          style={styles.backIcon}
+        />
+        <Text style={styles.headerTitle}>Settings</Text>
+      </View>
 
-      <Text style={styles.label}>First Name</Text>
-      <TextInput value={firstName} onChangeText={setFirstName} style={styles.input} />
-
-      <Text style={styles.label}>Last Name</Text>
-      <TextInput value={lastName} onChangeText={setLastName} style={styles.input} />
-
-      <Text style={styles.label}>Email</Text>
-      <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
-
-      <Text style={styles.label}>Password</Text>
-      <TextInput value={password} onChangeText={setPassword} style={styles.input} secureTextEntry />
-
-      <View style={styles.buttonContainer}>
-        <Button title="Save Changes" onPress={handleSave} />
-      </View> */}
+      <View style={styles.editButtonContainer}>
+        <Button title="Edit Profile" onPress={() => navigation.navigate('EditProfile')} color='black'/>
+      </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Log Out" onPress={handleLogout} color="red" />
+        <Button title="Log Out" onPress={handleLogout} color='red' borderColor='red'/>
       </View>
     </View>
   );
@@ -55,21 +41,42 @@ export default SettingsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
     backgroundColor: '#fff',
+    paddingTop: 50,
+  },
+  backIcon: {
+    position: 'absolute',
+    left: 10, 
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10, 
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    justifyContent: 'center',
+    marginLeft: 120,
   },
   label: {
     marginTop: 15,
     fontWeight: 'bold',
   },
-  input: {
+  editButtonContainer: {
+    marginTop: 20,
+    backgroundColor: 'white',
+    borderRadius: 30,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 5,
   },
   buttonContainer: {
     marginTop: 20,
+    backgroundColor: 'white',
+    borderColor: 'red',
+    borderRadius: 30,
+    borderWidth: 1,
   },
 });
