@@ -1,92 +1,160 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, Platform, Alert, ActivityIndicator } from 'react-native';
+import * as Calendar from 'expo-calendar';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-const sampleMeals = [
-  {id: '1', title: 'Breakfast - Oatmeal with Fruits', image: require('../../assets/oatmeal_fruit.jpg')},
-  {id: '2', title: 'Grilled Chicken Salad', image: require('../../assets/chicken_salad.jpg')},
-  {id: '3', title: 'Spaghetti', image: require('../../assets/spaghetti.jpg')}
-];
+const MealPlanScreen = () => {
+  const [breakfastMeals, setBreakfastMeals] = useState([]);
+  const [lunchMeals, setLunchMeals] = useState([]);
+  const [dinnerMeals, setDinnerMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default function MealPlan() {
-  
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  useEffect(() => {
+    fetchMeals();
+  }, []);
+
+  const fetchMeals = async () => {
+    try {
+      // Load breakfast, lunch, and dinner separately
+      const breakfastResponse = await fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=Breakfast');
+      const lunchResponse = await fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood');
+      const dinnerResponse = await fetch('https://www.themealdb.com/api/json/v1/1/filter.php?c=Beef');
+
+      const breakfastData = await breakfastResponse.json();
+      const lunchData = await lunchResponse.json();
+      const dinnerData = await dinnerResponse.json();
+
+      setBreakfastMeals(breakfastData.meals || []);
+      setLunchMeals(lunchData.meals || []);
+      setDinnerMeals(dinnerData.meals || []);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const getDefaultCalendarSource = async () => {
+    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    const defaultCalendar = calendars.find(each => each.source.name === 'Default');
+    return defaultCalendar?.source || calendars[0]?.source;
+  };
+
+  const createCalendarIfNeeded = async () => {
+    const defaultSource = await getDefaultCalendarSource();
+    const newCalendarID = await Calendar.createCalendarAsync({
+      title: 'Meal Plan',
+      color: 'blue',
+      entityType: Calendar.EntityTypes.EVENT,
+      sourceId: defaultSource.id,
+      source: defaultSource,
+      name: 'Meal Plan Calendar',
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    return newCalendarID;
+  };
+
+  const addMealToCalendar = async (meal, date) => {
+    try {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Calendar permission is required to add meal plans.');
+        return;
+      }
+
+      const calendars = await Calendar.getCalendarsAsync();
+      let calendar = calendars.find(cal => cal.title === 'Meal Plan');
+      if (!calendar) {
+        const calendarId = await createCalendarIfNeeded();
+        calendar = { id: calendarId };
+      }
+
+      await Calendar.createEventAsync(calendar.id, {
+        title: `Meal: ${meal.strMeal}`,
+        startDate: date,
+        endDate: new Date(date.getTime() + 60 * 60 * 1000), // 1-hour duration
+        timeZone: 'GMT',
+        notes: `Meal from MealPlan App.`,
+      });
+
+      Alert.alert('Success', 'Meal added to your Calendar!');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleMealPress = (meal) => {
+    setSelectedMeal(meal);
+    setShowDatePicker(true);
+  };
+
+  const handleDateChange = (event, date) => {
+    if (date) {
+      setShowDatePicker(false);
+      addMealToCalendar(selectedMeal, date);
+    } else {
+      setShowDatePicker(false);
+    }
+  };
+
   const renderMealItem = ({ item }) => (
-    <View style={styles.mealCard}>
-      <Image source={item.image} style={styles.mealImage} />
-      <Text style={styles.mealTitle}>{item.title}</Text>
-    </View>
-  );
-  
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Plan Your Next Meal</Text>
-    <FlatList 
-    data={sampleMeals}
-    renderItem={renderMealItem}
-    keyExtractor={(item) => item.id}
-    style={styles.mealList}
-    />
-    <TouchableOpacity style={styles.addButton}>
-    <Text style={styles.addButtonText}>+ Add Meal</Text>
+    <TouchableOpacity onPress={() => handleMealPress(item)} style={{ flexDirection: 'row', marginVertical: 10, alignItems: 'center' }}>
+      <Image
+        source={{ uri: item.strMealThumb }}
+        style={{ width: 80, height: 80, borderRadius: 8, marginRight: 10 }}
+      />
+      <Text style={{ fontSize: 18 }}>{item.strMeal}</Text>
     </TouchableOpacity>
+  );
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, padding: 20 }}>
+      <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 10 }}>Pick a Meal to Add to Calendar</Text>
+
+      <Text style={{ fontSize: 22, marginTop: 15 }}>🍳 Breakfast</Text>
+      <FlatList
+        data={breakfastMeals}
+        keyExtractor={item => item.idMeal}
+        renderItem={renderMealItem}
+      />
+
+      <Text style={{ fontSize: 22, marginTop: 25 }}>🥗 Lunch</Text>
+      <FlatList
+        data={lunchMeals}
+        keyExtractor={item => item.idMeal}
+        renderItem={renderMealItem}
+      />
+
+      <Text style={{ fontSize: 22, marginTop: 25 }}>🍝 Dinner</Text>
+      <FlatList
+        data={dinnerMeals}
+        keyExtractor={item => item.idMeal}
+        renderItem={renderMealItem}
+      />
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      )}
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    alignItems: 'center',
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  mealList: {
-    flexGrow: 0,
-  },
-  mealCard: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5, 
-    elevation: 3,
-    alignItems: 'center',
-  },
-  mealImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  mealTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  addButton: {
-    backgroundColor: '#4CAf50',
-    padding: 15,
-    borderRadius: 50,
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    elevation: 5,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
-
+export default MealPlanScreen;
