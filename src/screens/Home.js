@@ -172,7 +172,7 @@ export default function Home() {
     <View style={styles.container}>     
       {/* Header with Profile Picture, Notifications, and Filter Icon */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleProfilePicUpload}>
+        <TouchableOpacity onPress={() => navigation.navigate('Account')}>
           <Image
             source={{ uri: profilePicture || 'https://www.w3schools.com/w3images/avatar2.png' }}
             style={styles.profilePic}
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   categoryContainer: {
     flexDirection: 'row',
     marginTop: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
   },
   categoryCircle: {
     backgroundColor: '#FF6347',
