@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, ActivityIndicator, TextInput, Modal, Button } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker'; // Import the image picker
 import { fetchRecipesFromAPI, fetchCategoriesFromAPI } from './api';
 
 export default function Home() {
@@ -10,8 +11,12 @@ export default function Home() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const EXLUDED_CATEGORIES = ['Starter', 'Vegan', 'Breakfast', 'Goat']
-  
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [notifications, setNotifications] = useState(3); // example: 3 notifications
+
+  const EXLUDED_CATEGORIES = ['Starter', 'Vegan', 'Breakfast', 'Goat'];
 
   const navigation = useNavigation();
 
@@ -20,7 +25,6 @@ export default function Home() {
     fetchRecipes();
     fetchCategories();
   }, []);
-
 
   const fetchRecipes = async () => {
     try {
@@ -75,7 +79,6 @@ export default function Home() {
         category => !EXLUDED_CATEGORIES.includes(category.strCategory)
       );
       
-
       const formattedCategories = filteredCategories.map(category => ({
         id: category.strCategory,
         name: renameCategory(category.strCategory),
@@ -87,7 +90,6 @@ export default function Home() {
       console.error("Error fetching categories: ", error);
     }
   };
-
 
   const getCategoryIcon = (categoryName) => {
     const iconMap = {
@@ -121,10 +123,34 @@ export default function Home() {
   };
 
   const filterByCategory = (categoryName) => {
+    setSelectedCategory(categoryName);
+    setShowFilter(false);
     navigation.navigate('SearchResults', { 
       categoryId: categoryName, 
       allRecipes: recipes 
     });
+  };
+
+  // Profile Picture Upload function
+  const handleProfilePicUpload = async () => {
+    // Ask for camera roll permissions (if not granted already)
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+
+    // Open the image picker
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1], // Aspect ratio for the profile picture (square)
+      quality: 1, // Full quality image
+    });
+
+    if (!result.cancelled) {
+      setProfilePicture(result.uri); // Set the selected image URI
+    }
   };
 
   const renderRecipeItem = ({ item }) => (
@@ -140,11 +166,28 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-
   const featuredRecipes = recipes.slice(0, 6);
 
   return (
     <View style={styles.container}>     
+      {/* Header with Profile Picture, Notifications, and Filter Icon */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleProfilePicUpload}>
+          <Image
+            source={{ uri: profilePicture || 'https://www.w3schools.com/w3images/avatar2.png' }}
+            style={styles.profilePic}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+          <MaterialCommunityIcons name="bell" size={28} color="black" />
+          {notifications > 0 && <View style={styles.notificationBadge}><Text style={styles.notificationText}>{notifications}</Text></View>}
+        </TouchableOpacity>
+        {/* Filter Icon */}
+        <TouchableOpacity onPress={() => setShowFilter(true)}>
+          <MaterialCommunityIcons name="filter" size={28} color="black" />
+        </TouchableOpacity>
+      </View>
+      
       {/* Search Bar */}
       <Searchbar
         placeholder="Search YummyFoods Recipe"
@@ -155,6 +198,33 @@ export default function Home() {
         onIconPress={handleSearch}
         style={styles.searchBar}
       />
+
+      {/* Filter Modal */}
+      <Modal
+        visible={showFilter}
+        onRequestClose={() => setShowFilter(false)}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.filterTitle}>Select Category</Text>
+            <FlatList
+              data={categories}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity 
+                  style={styles.filterOption}
+                  onPress={() => filterByCategory(item.id)}
+                >
+                  <Text style={styles.filterText}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <Button title="Close" onPress={() => setShowFilter(false)} />
+          </View>
+        </View>
+      </Modal>
 
       {/* Categories */}
       <View style={styles.categoryContainer}>
@@ -177,7 +247,6 @@ export default function Home() {
             )}
           />
         ) : (
-
           [1, 2, 3, 4].map((item, index) => (
             <View key={index} style={styles.categoryCircle} />
           ))
@@ -216,78 +285,119 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     backgroundColor: '#fff',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: 10,
+    alignItems: 'center',
+  },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#ccc',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   searchBar: {
     width: '90%',
-    marginTop: 0,
-    marginBottom: 10,  
+    marginTop: 10,
     backgroundColor: '#cee8c8'  
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  filterOption: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  filterText: {
+    fontSize: 16,
   },
   categoryContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 15,
-    width: '100%',
+    marginTop: 20,
     paddingHorizontal: 10,
   },
   categoryCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'orange',
+    backgroundColor: '#FF6347',
+    borderRadius: 40,
+    height: 80,
+    width: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginRight: 10,
   },
   categoryText: {
     color: 'white',
-    fontSize: 10,
-    marginTop: 4,
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   sectionContainer: {
-    width: '100%',
-    marginBottom: 20,
-    paddingHorizontal: 15,
+    marginTop: 20,
+    width: '90%',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    marginLeft: 5,
-  },
-  recipeList: {
-    width: '100%',
   },
   recipeCard: {
-    flex: 1,
+    width: '48%',
     margin: 5,
-    borderRadius: 10,
+    borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: '#ffe0cc',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
+    backgroundColor: '#f9f9f9',
   },
   image: {
     width: '100%',
     height: 120,
-    borderRadius: 10,
+    resizeMode: 'cover',
   },
   recipeTitle: {
-    padding: 8,
+    padding: 10,
+    fontSize: 14,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 50,
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 50,
-    fontSize: 16,
-    color: '#888',
+    marginTop: 20,
+    fontSize: 18,
+  },
+  recipeList: {
+    marginTop: 10,
   },
 });
