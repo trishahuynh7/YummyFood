@@ -57,20 +57,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#d1e6cc'
+    backgroundColor: '#d1e6cc',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 50,
+    marginBottom: 5
   },
   profileSection: {
     alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    marginBottom: 5,
     backgroundColor: '#d1e6cc'
   },
   profileImage: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   editProfileButton: {
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 30,
     padding: 10,
     backgroundColor: '#F8931F',
     borderRadius: 15,
@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
   },
   recipesSection: {
     flex: 1,
-    paddingHorizontal: 10,
   },
   sectionTitle: {
     flexDirection: 'row',
