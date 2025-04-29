@@ -28,7 +28,7 @@ export default function Account({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{user.username}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Entypo name="menu" size={30} color="black" />
+          <Entypo name="menu" size={30} color="black" marginTop='45'/>
         </TouchableOpacity>
       </View>
 
@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginTop: 50,
   },
   profileSection: {
     alignItems: 'center',
