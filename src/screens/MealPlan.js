@@ -121,8 +121,8 @@ const MealPlanScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, padding: 20, paddingTop: 60 }}>
-      <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 10}}>Meal Plan</Text>
+    <View style={{ flex: 1, backgroundColor: '#fff', padding: 20, paddingTop: 60 }}>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 10}}>Meal Plan</Text>
       <Text style={{ fontSize: 18, marginBottom: 1}}>Pick a Meal to Add to Calendar.</Text>
 
       {/* Breakfast */}
