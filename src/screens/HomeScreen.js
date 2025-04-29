@@ -27,9 +27,10 @@ export default function HomeScreen() {
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
+        headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Home" component={Home}/>
       <Tab.Screen name="MealPlan" component={MealPlan} />
       <Tab.Screen name="Camera" component={Camera} />
       <Tab.Screen name="Saved" component={SavedRecipe} />
