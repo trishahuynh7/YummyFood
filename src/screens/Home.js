@@ -142,7 +142,7 @@ export default function Home() {
 
     // Open the image picker
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
       allowsEditing: true,
       aspect: [1, 1], // Aspect ratio for the profile picture (square)
       quality: 1, // Full quality image
@@ -282,14 +282,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: 50,
     backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    padding: 10,
+    padding: 20,
     alignItems: 'center',
   },
   profilePic: {
@@ -317,7 +317,6 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     width: '90%',
-    marginTop: 10,
     backgroundColor: '#cee8c8'  
   },
   modalOverlay: {
@@ -333,8 +332,10 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   filterTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterOption: {
     paddingVertical: 10,
