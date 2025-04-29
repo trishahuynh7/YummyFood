@@ -1,14 +1,25 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, Image, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { Entypo, Feather } from '@expo/vector-icons';
 import SavedRecipe from './SavedRecipe';
 
 // PLACEHOLDER FOR NOW. Will update with actual user account info.
 export default function Account({ navigation }) {
-  const user = {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [user, setUser] = useState({
     username: 'JohnDoe',
-    name: 'John Doe',
-    profileImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-VVAFQW2U8NQA87BUSeV-Er2L7_vKUbu0HA&s',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'johndoe123@gmail.com',
+    profileImage: 'https://www.w3schools.com/w3images/avatar2.png',
+  });
+
+  const handleSave = (updatedData) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedData,
+    }));
+    // Add code to update saved data to backend for user
   };
 
   return (
@@ -24,17 +35,13 @@ export default function Account({ navigation }) {
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
-        <TouchableOpacity style={styles.editProfileButton}>
+        <TouchableOpacity style={styles.editProfileButton} onPress={() => navigation.navigate('EditProfile')}>
           <Text style={styles.editProfileText}>Edit Profile</Text>
-          {/* Add code for Edit Profile. Make as Modal */}
         </TouchableOpacity>
       </View>
 
       {/* Saved Recipes Section */}
       <View style={styles.recipesSection}>
-        <Text style={styles.sectionTitle}>My Recipes</Text>
-          {/* Delete the plus icon on the lower right.  Have the user create their own recipe from a */}
-          {/* different add icon located elsewhere. */}
         <SavedRecipe />
       </View>
     </View>
@@ -79,28 +86,30 @@ const styles = StyleSheet.create({
   editProfileButton: {
     marginTop: 10,
     marginBottom: 20,
-    padding: 8,
-    backgroundColor: '#f57c00',
-    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#F8931F',
+    borderRadius: 15,
   },
   editProfileText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  recipesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    paddingHorizontal: 15,
   },
   recipesSection: {
     flex: 1,
     paddingHorizontal: 15,
   },
   sectionTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     fontSize: 20,
     fontWeight: 'bold',
-    paddingHorizontal: 15,
-    marginBottom: 1,
   },
 });
-
-// TODO:
-// 1. Add a profile picture
-// 2. Add a username
-// 3. Add a "My Recipes" section 
-// 4. Add a Settings option w/ cog icon navigating to Settings Page
