@@ -108,7 +108,7 @@ const MealPlanScreen = () => {
         source={{ uri: item.strMealThumb }}
         style={{ width: 80, height: 80, borderRadius: 8, marginRight: 10 }}
       />
-      <Text style={{ fontSize: 18 }}>{item.strMeal}</Text>
+      <Text style={{ fontSize: 18, flexWrap: 'wrap', width: '70%'  }}>{item.strMeal}</Text>
     </TouchableOpacity>
   );
 
@@ -122,23 +122,26 @@ const MealPlanScreen = () => {
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 10 }}>Pick a Meal to Add to Calendar</Text>
+      <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 10}}>Pick a Meal to Add to Calendar</Text>
 
-      <Text style={{ fontSize: 22, marginTop: 15 }}>🍳 Breakfast</Text>
+      {/* Breakfast */}
+      <Text style={{ fontSize: 22, fontWeight: 'bold', marginTop: 25,  marginBottom: 25, backgroundColor: '#FFEB8D', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, textAlign: 'center'  }}>🍳 Breakfast</Text>
       <FlatList
         data={breakfastMeals}
         keyExtractor={item => item.idMeal}
         renderItem={renderMealItem}
       />
 
-      <Text style={{ fontSize: 22, marginTop: 25 }}>🥗 Lunch</Text>
+      {/* Lunch */}
+      <Text style={{ fontSize: 22, fontWeight: 'bold', marginTop: 25,  marginBottom: 25, backgroundColor: '#A5D6A7', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, textAlign: 'center' }}>🥗 Lunch</Text>
       <FlatList
         data={lunchMeals}
         keyExtractor={item => item.idMeal}
         renderItem={renderMealItem}
       />
 
-      <Text style={{ fontSize: 22, marginTop: 25 }}>🍝 Dinner</Text>
+      {/* Dinner  */}
+      <Text style={{ fontSize: 22, fontWeight: 'bold', marginTop: 25, marginBottom: 25, backgroundColor: '#FFCCBC', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, textAlign: 'center' }}>🍝 Dinner</Text>
       <FlatList
         data={dinnerMeals}
         keyExtractor={item => item.idMeal}
